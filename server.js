@@ -1,22 +1,16 @@
 const express=require("express") 
 const dotenv=require("dotenv")
 
+
+const authRoutes=require('./routes/auth.route')
+
+
 dotenv.config()
 const app=express() 
 
-const port=process.env.PORT
+const port=process.env.PORT || 3000
 
-app.get("/api/auth/signup",(req,res)=>{
-    res.send("Signup Endpoint")
-})
-
-app.get("/api/auth/login",(req,res)=>{
-    res.send("Login Endpoint")
-})
-
-app.get("/api/auth/logout",(req,res)=>{
-    res.send("Logout Endpoint")
-})
+app.use('/api/auth',authRoutes)
 
 
 app.listen(port,()=>{
