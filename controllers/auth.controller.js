@@ -1,7 +1,9 @@
 
+const { sendWelcomeEmail } = require('../emails/emailHandler');
 const { generateToken } = require('../lib/utils');
 const User = require('../models/User');
-const bcrypt=require('bcrypt')
+const bcrypt = require('bcrypt')
+const dotenv = require("dotenv")
 
 const signup = async (req, res) => {
 
@@ -30,36 +32,43 @@ const signup = async (req, res) => {
         }
 
 
-        const user=await User.findOne({email});
+        const user = await User.findOne({ email });
 
-        if(user) return res.status(400).json({message:"User already exitst"})
+        if (user) return res.status(400).json({ message: "User already exitst" })
 
-        const salt = await bcrypt.genSalt(10)    
-        const hashedPassword=await bcrypt.hash(password,salt) 
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
 
-        const newUser=new User({
+        const newUser = new User({
             fullName,
             email,
-            password:hashedPassword
+            password: hashedPassword
         })
 
-        if(newUser){
-            generateToken(newUser._id , res )
-            await newUser.save()
+        if (newUser) {
+
+            const savedUser=await newUser.save()
+            generateToken(newUser._id, res)
 
             res.status(201).json({
-                _id:newUser._id,
-                fullName:newUser.fullName,
-                email:newUser.email,
-                profilePic:newUser.profile 
+                _id: newUser._id,
+                fullName: newUser.fullName,
+                email: newUser.email,
+                profilePic: newUser.profile
             })
-        }else{
-            res.status(400).json({message:"Invalid user data"})
+
+            try {
+                await sendWelcomeEmail(savedUser?.email,savedUser?.fullName,process.env.CLIENT_URL)
+            } catch (error) {
+                console.log("Failed to send welcome message",error)
+            }
+        } else {
+            res.status(400).json({ message: "Invalid user data" })
         }
 
     } catch (error) {
-        console.log("Error in signup controller",error)
-        res.status(500).json({message:"Internal Server Error"})
+        console.log("Error in signup controller", error)
+        res.status(500).json({ message: "Internal Server Error" })
     }
 }
 
