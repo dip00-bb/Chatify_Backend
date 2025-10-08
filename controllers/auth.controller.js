@@ -88,10 +88,10 @@ const login = async (req, res) => {
         generateToken(user._id, res)
 
         res.status(201).json({
-            _id: newUser._id,
-            fullName: newUser.fullName,
-            email: newUser.email,
-            profilePic: newUser.profile
+            _id: user._id,
+            fullName: user.fullName,
+            email: user.email,
+            profilePic: user.profile
         })
 
     } catch (error) {
@@ -100,4 +100,14 @@ const login = async (req, res) => {
     }
 }
 
-module.exports = { signup, login }
+
+
+
+const logout=(_,res)=>{
+    res.cookie("jwt","",{maxAge:0})
+    res.status(200).json({message:"Logged out succesful"})
+}
+
+
+
+module.exports = { signup, login ,logout}
