@@ -1,16 +1,21 @@
 const express = require("express")
 const dotenv = require("dotenv")
 
-const { connectDB } = require('./lib/db')
+const cookieParser = require("cookie-parser")
+const { protectRoute } = require("./middleware/auth.middleware")
 
+
+const { connectDB } = require('./lib/db')
 const authRoutes = require('./routes/auth.route')
 const messageRoutes = require('./routes/message.route')
+
 
 dotenv.config()
 const app = express()
 
 const port = process.env.PORT || 3000
 app.use(express.json())
+app.use(cookieParser())
 
 
 app.use('/api/auth', authRoutes)
