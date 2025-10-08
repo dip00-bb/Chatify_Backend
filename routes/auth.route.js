@@ -1,14 +1,12 @@
 const express = require("express");
-const { signup } = require("../controllers/auth.controller");
+const { signup, login } = require("../controllers/auth.controller");
 
 const router = express.Router();
-router.get("/signup", signup)
+router.post("/signup", signup)
 
-router.get("/login", (req, res) => {
-    res.send("Login Endpoint")
-})
+router.post("/login", login)
 
-router.get("/logout", (req, res) => {
+router.post("/logout", (req, res) => {
     res.send("Logout Endpoint")
 })
 

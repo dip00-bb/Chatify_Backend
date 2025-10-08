@@ -47,7 +47,7 @@ const signup = async (req, res) => {
 
         if (newUser) {
 
-            const savedUser=await newUser.save()
+            const savedUser = await newUser.save()
             generateToken(newUser._id, res)
 
             res.status(201).json({
@@ -58,9 +58,9 @@ const signup = async (req, res) => {
             })
 
             try {
-                await sendWelcomeEmail(savedUser?.email,savedUser?.fullName,process.env.CLIENT_URL)
+                await sendWelcomeEmail(savedUser?.email, savedUser?.fullName, process.env.CLIENT_URL)
             } catch (error) {
-                console.log("Failed to send welcome message",error)
+                console.log("Failed to send welcome message", error)
             }
         } else {
             res.status(400).json({ message: "Invalid user data" })
@@ -73,4 +73,31 @@ const signup = async (req, res) => {
 }
 
 
-module.exports = { signup }
+const login = async (req, res) => {
+    const { email, password } = req.body
+
+    try {
+        const user = await User.findOne({ email })
+
+        if (!user) return res.status(400).json({ message: "Invalid Credantials" })
+
+        const isPasswordCorrect = await bcrypt.compare(password, user.password)
+
+        if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid Credantials" })
+
+        generateToken(user._id, res)
+
+        res.status(201).json({
+            _id: newUser._id,
+            fullName: newUser.fullName,
+            email: newUser.email,
+            profilePic: newUser.profile
+        })
+
+    } catch (error) {
+        console.log("Error in login controller",error)
+        res.status(500).json({message:"Internal server error"})
+    }
+}
+
+module.exports = { signup, login }
